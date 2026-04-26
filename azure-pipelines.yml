@@ -1,35 +1,43 @@
 trigger:
- - main
+- main
+
 pool:
- vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest'
+
 variables:
- imageName: 'tasktracker'
- acrName: 'acrtasktracker<your-name>'
+  imageName: 'tasktracker'
+  # Yahan apna ACR name theek karein (e.g., rigistry)
+  acrName: 'rigistry' 
+
 stages:
- - stage: Build
- jobs:
- - job: BuildPush
- steps:
- - task: Docker@2
- inputs:
- containerRegistry: 'acr-connection'
- repository: $(imageName)
- command: 'buildAndPush'
- Dockerfile: '**/Dockerfile'
- tags: |
- $(Build.BuildId)
- latest
- - stage: DeployAppService
- dependsOn: Build
- jobs:
- - deployment: WebDeploy
- environment: 'production'
- strategy:
- runOnce:
- deploy:
- steps:
- - task: AzureWebAppContainer@1
- inputs:
- azureSubscription: '<your-subscription>'
- appName: 'tasktracker-web-<your-name>'
- containers: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'
+- stage: Build
+  displayName: Build and Push Stage
+  jobs:
+  - job: BuildPush
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'acr-connection'
+        repository: $(imageName)
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(Build.BuildId)
+          latest
+
+- stage: DeployAppService
+  dependsOn: Build
+  jobs:
+  - deployment: WebDeploy
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebAppContainer@1
+            inputs:
+              # Yahan apni Service Connection ka naam likhein (e.g., azure-conn)
+              azureSubscription: 'azure-conn'
+              # Apna Web App name sahi likhein
+              appName: 'tasktracker-web'
+              imageName: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'
