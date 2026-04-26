@@ -1,0 +1,35 @@
+trigger:
+ - main
+pool:
+ vmImage: 'ubuntu-latest'
+variables:
+ imageName: 'tasktracker'
+ acrName: 'acrtasktracker<your-name>'
+stages:
+ - stage: Build
+ jobs:
+ - job: BuildPush
+ steps:
+ - task: Docker@2
+ inputs:
+ containerRegistry: 'acr-connection'
+ repository: $(imageName)
+ command: 'buildAndPush'
+ Dockerfile: '**/Dockerfile'
+ tags: |
+ $(Build.BuildId)
+ latest
+ - stage: DeployAppService
+ dependsOn: Build
+ jobs:
+ - deployment: WebDeploy
+ environment: 'production'
+ strategy:
+ runOnce:
+ deploy:
+ steps:
+ - task: AzureWebAppContainer@1
+ inputs:
+ azureSubscription: '<your-subscription>'
+ appName: 'tasktracker-web-<your-name>'
+ containers: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'
