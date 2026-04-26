@@ -6,18 +6,19 @@ pool:
 
 variables:
   imageName: 'tasktracker'
-  # Yahan apna ACR name theek karein (e.g., rigistry)
+  # Aapki registry ka naam 'rigistry' hai
   acrName: 'rigistry' 
 
 stages:
 - stage: Build
-  displayName: Build and Push Stage
+  displayName: 'Build and Push to ACR'
   jobs:
   - job: BuildPush
     steps:
     - task: Docker@2
+      displayName: 'Build and Push Image'
       inputs:
-        containerRegistry: 'acr-connection'
+        containerRegistry: 'acr-connection' #
         repository: $(imageName)
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
@@ -26,6 +27,7 @@ stages:
           latest
 
 - stage: DeployAppService
+  displayName: 'Deploy to Azure Web App'
   dependsOn: Build
   jobs:
   - deployment: WebDeploy
@@ -35,9 +37,9 @@ stages:
         deploy:
           steps:
           - task: AzureWebAppContainer@1
+            displayName: 'Azure Web App on Container Deploy'
             inputs:
-              # Yahan apni Service Connection ka naam likhein (e.g., azure-conn)
-              azureSubscription: 'azure-conn'
-              # Apna Web App name sahi likhein
+              # Connection name should match 'azure-connection'
+              azureSubscription: 'azure-connection' 
               appName: 'tasktracker-web'
               imageName: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'
