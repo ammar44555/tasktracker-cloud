@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TaskTracker Cloud</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="bg-animation" id="bgAnim"></div>
+
   <div class="container">
     <h1>TaskTracker Cloud</h1>
     <p>Running on Azure</p>
 
-    <!-- Tasks Section -->
     <div class="section">
       <h2>📝 Tasks</h2>
       <div class="form-row">
@@ -20,7 +22,6 @@
       <ul id="taskList"></ul>
     </div>
 
-    <!-- Files Section (NEW) -->
     <div class="section">
       <h2>📁 Files (Azure Blob Storage)</h2>
       <div class="form-row">
@@ -33,12 +34,31 @@
   </div>
 
   <script>
-    // ====== Tasks ======
+    // ====== Background Animation ======
+    const bgAnim = document.getElementById('bgAnim');
+    const symbols = ['^', '>', '<', 'v', '{', '}']; 
+
+    function createSymbol() {
+        const el = document.createElement('div');
+        el.className = 'carat';
+        el.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+        el.style.left = Math.random() * 100 + "vw";
+        const duration = Math.random() * 5 + 7; 
+        el.style.animationDuration = duration + "s";
+        el.style.fontSize = (Math.random() * 15 + 15) + "px";
+        bgAnim.appendChild(el);
+        setTimeout(() => { el.remove(); }, duration * 1000);
+    }
+    setInterval(createSymbol, 400);
+
+    // ====== Tasks Logic ======
     async function loadTasks() {
-      const res = await fetch('/api/tasks');
-      const tasks = await res.json();
-      document.getElementById('taskList').innerHTML = 
-        tasks.map(t => `<li>${t.title}</li>`).join('');
+      try {
+        const res = await fetch('/api/tasks');
+        const tasks = await res.json();
+        document.getElementById('taskList').innerHTML = 
+          tasks.map(t => `<li>${t.title}</li>`).join('');
+      } catch (err) { console.error("Tasks load failed", err); }
     }
 
     async function addTask() {
@@ -53,41 +73,35 @@
       loadTasks();
     }
 
-    // ====== Files (NEW) ======
+    // ====== Files Logic ======
     async function loadFiles() {
-      const res = await fetch('/api/files');
-      const files = await res.json();
-      document.getElementById('fileList').innerHTML = files.map(f => `
-        <li>
-          <strong>${f.name}</strong>
-          (${(f.size / 1024).toFixed(2)} KB)
-          <a href="/api/files/${encodeURIComponent(f.name)}">Download</a>
-          <button onclick="deleteFile('${f.name}')">Delete</button>
-        </li>
-      `).join('');
+      try {
+        const res = await fetch('/api/files');
+        const files = await res.json();
+        document.getElementById('fileList').innerHTML = files.map(f => `
+          <li>
+            <strong>${f.name}</strong>
+            (${(f.size / 1024).toFixed(2)} KB)
+            <a href="/api/files/${encodeURIComponent(f.name)}">Download</a>
+            <button onclick="deleteFile('${f.name}')" style="margin-left:10px; background:#ff4d4d; padding:4px 8px;">Delete</button>
+          </li>
+        `).join('');
+      } catch (err) { console.error("Files load failed", err); }
     }
 
     async function uploadFile() {
       const input = document.getElementById('fileInput');
       const status = document.getElementById('uploadStatus');
-      
       if (!input.files[0]) {
         status.textContent = 'Please select a file';
         return;
       }
-
       const formData = new FormData();
       formData.append('file', input.files[0]);
-
       status.textContent = 'Uploading...';
-      
       try {
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData
-        });
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
         const data = await res.json();
-        
         if (data.success) {
           status.textContent = '✅ Uploaded: ' + data.name;
           input.value = '';
@@ -106,7 +120,7 @@
       loadFiles();
     }
 
-    // Load on page open
+    // Initial Load
     loadTasks();
     loadFiles();
   </script>
