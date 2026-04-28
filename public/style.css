@@ -4,66 +4,47 @@ body {
   margin: 0;
   padding: 20px;
   min-height: 100vh;
+  overflow-x: hidden; /* Animation screen se bahar na jaye */
+  position: relative;
 }
 
+/* Background animation container */
+.bg-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Content ke piche rakhne ke liye */
+  pointer-events: none;
+}
+
+/* Floating symbols style */
+.carat {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.15); /* Halka white color */
+  font-size: 20px;
+  font-weight: bold;
+  user-select: none;
+  animation: floatUp 10s linear infinite;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(110vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% {
+    transform: translateY(-10vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Baqi aapka purana container code yahan rahega... */
 .container {
+  position: relative; /* Z-index issue se bachne ke liye */
   max-width: 600px;
-  margin: 40px auto;
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-}
-
-h1 { color: #333; margin-bottom: 5px; }
-h2 { color: #555; font-size: 18px; margin-top: 25px; }
-
-.section {
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px solid #eee;
-}
-
-.form-row {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-input[type="text"], input[type="file"] {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-button {
-  padding: 8px 18px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-button:hover { background: #5568d3; }
-
-ul { list-style: none; padding: 0; }
-li { 
-  padding: 8px; 
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-li a { color: #667eea; text-decoration: none; }
-li a:hover { text-decoration: underline; }
-
-#uploadStatus { 
-  color: #555; 
-  font-size: 14px; 
-  margin: 8px 0; 
+  /* ... baqi purana code */
 }
