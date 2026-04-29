@@ -41,10 +41,9 @@ stages:
             displayName: 'Deploy to AKS'
             inputs:
               action: 'deploy'
-              # Aapka sahi connection name
-              kubernetesServiceConnection: 'k8s connection' 
+              kubernetesServiceConnection: 'k8s connection' #
               namespace: $(k8sNamespace)
-              manifests: |
-                $(System.DefaultWorkingDirectory)/deployment.yaml
+              # Wildcard use kiya hai taake file lazmi mil jaye
+              manifests: '**/deployment.yaml' 
               containers: |
                 $(acrName).azurecr.io/$(imageName):$(Build.BuildId)
