@@ -7,7 +7,6 @@ pool:
 variables:
   imageName: 'tasktracker'
   acrName: 'rigistry' 
-  # Aapka select kiya hua namespace
   k8sNamespace: 'tasktracker' 
 
 stages:
@@ -33,7 +32,6 @@ stages:
   condition: succeeded()
   jobs:
   - deployment: AKSDeploy
-    # Is se Approval Gate trigger hoga
     environment: 'production' 
     strategy:
       runOnce:
@@ -43,8 +41,8 @@ stages:
             displayName: 'Deploy to AKS'
             inputs:
               action: 'deploy'
-              # Azure DevOps mein banaya gaya connection
-              kubernetesServiceConnection: 'tasktracker-aks-conn' 
+              # Aapka sahi connection name
+              kubernetesServiceConnection: 'k8s connection' 
               namespace: $(k8sNamespace)
               manifests: |
                 $(System.DefaultWorkingDirectory)/deployment.yaml
