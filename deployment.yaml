@@ -15,7 +15,6 @@ spec:
     spec:
       containers:
       - name: web-app
-        # Build ke baad image yahan se uthayi jayegi
         image: rigistry.azurecr.io/tasktracker:latest
         ports:
         - containerPort: 8080
