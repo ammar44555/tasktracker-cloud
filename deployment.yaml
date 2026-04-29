@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: web-app
-        image: rigistry.azurecr.io/tasktracker:latest
+        image: registry.azurecr.io/tasktracker:latest
         ports:
         - containerPort: 8080
         env:
