@@ -6,8 +6,8 @@ pool:
 
 variables:
   imageName: 'tasktracker'
-  acrName: 'rigistry' 
-  k8sNamespace: 'tasktracker' 
+  acrName: 'rigistry'
+  k8sNamespace: 'tasktracker'
 
 stages:
 - stage: Build
@@ -32,18 +32,19 @@ stages:
   condition: succeeded()
   jobs:
   - deployment: AKSDeploy
-    environment: 'production' 
+    environment: 'production'
     strategy:
       runOnce:
         deploy:
           steps:
+          - checkout: self
+
           - task: KubernetesManifest@0
             displayName: 'Deploy to AKS'
             inputs:
               action: 'deploy'
-              kubernetesServiceConnection: 'k8s connection' #
+              kubernetesServiceConnection: 'k8s connection'
               namespace: $(k8sNamespace)
-              # Wildcard use kiya hai taake file lazmi mil jaye
-              manifests: '**/deployment.yaml' 
+              manifests: '$(Build.SourcesDirectory)/deployment.yaml'
               containers: |
                 $(acrName).azurecr.io/$(imageName):$(Build.BuildId)
